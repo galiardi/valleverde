@@ -1,15 +1,23 @@
 import express from 'express';
-import helmet from 'helmet';
 import morgan from 'morgan';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import fileupload from 'express-fileupload';
 import apiRouter from './routes/api/index.js';
+import pagesRouter from './routes/pages/index.js';
 
 const app = express();
 
-app.use(helmet());
+app.set('view engine', 'hbs');
+app.set('views', 'src/views');
+
 app.use(morgan('dev'));
+app.use(cors());
+// guardaremos el jwt en las cookies para saber si el usuario esta logeado antes de renderizar las vistas
+app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false })); // para leer el id enviado en el body junto al archivo de la imagen
+// usaremos urlencoded para leer el id enviado en el body junto al archivo de la imagen
+app.use(express.urlencoded({ extended: false }));
 app.use(
   fileupload()
   //   {
@@ -21,5 +29,6 @@ app.use(
 );
 app.use(express.static('src/public'));
 app.use('/api', apiRouter);
+app.use('/', pagesRouter); // las rutas que renderizaran las vistas
 
 export default app;

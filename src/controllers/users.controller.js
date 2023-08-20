@@ -1,14 +1,15 @@
 import { usersModel } from '../models/users.model.js';
 
-async function register(req, res) {
+async function registerUser(req, res) {
   const response = {
     message: 'Register user',
     data: null,
     error: null,
   };
 
-  const { nombre, apellido, rut, correo, contrasena, id_rol } = req.body;
-  if (!nombre || !apellido || !rut || !correo || !contrasena || !id_rol) {
+  // id_rol (ver usersModel)
+  const { nombre, apellido, rut, correo, contrasena } = req.body;
+  if (!nombre || !apellido || !rut || !correo || !contrasena) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
@@ -24,9 +25,18 @@ async function register(req, res) {
     response.error = result;
     return res.status(409).send(response);
   }
-
-  response.data = { insertId: result.insertId };
-  res.status(201).send(response);
+  // el token en el body que el cliente lo guarde en el localhost para luego enviarlo en el header a la api
+  // el token en las cookies es para leerlo antes de entrar a las rutas que renderizan las vistas
+  // PENDIENTE decidir si trabajamos solo con el token en las cookies
+  const token = result;
+  response.data = { token };
+  res
+    .cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    .status(200)
+    .send(response);
 }
 
 async function login(req, res) {
@@ -45,129 +55,93 @@ async function login(req, res) {
   const result = await usersModel.login(req.body);
 
   if (result === null) {
-    response.error = 'Error logining user';
+    response.error = 'Error logging in user';
     return res.status(500).send(response);
   }
 
-  response.data = { token: result.token };
-  res.status(201).send(response);
+  if (result === false) {
+    response.error = 'Invalid user or password';
+    return res.status(401).send(response);
+  }
+  // el token en el body que el cliente lo guarde en el localhost para luego enviarlo en el header a la api
+  // el token en las cookies es para leerlo antes de entrar a las rutas que renderizan las vistas
+  // PENDIENTE decidir si trabajamos solo con el token en las cookies
+  const token = result;
+
+  response.data = { token };
+  res
+    .cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    .status(200)
+    .send(response);
 }
 
-// async function getAllusers(req, res) {
-//   const response = {
-//     data: null,
-//     error: null,
-//   };
+async function recoverPassword(req, res) {
+  const response = {
+    message: 'Recover password',
+    data: null,
+    error: null,
+  };
 
-//   const { name, material } = req.query;
+  const { correo } = req.body;
+  if (!correo) {
+    response.error = 'Missing required parameter';
+    return res.status(400).send(response);
+  }
 
-//   let result;
+  const result = await usersModel.recoverPassword(correo);
 
-//   if (name || material) {
-//     result = await usersModel.getFiltered({ name, material });
-//   } else {
-//     result = await usersModel.getAll();
-//   }
+  if (result === null) {
+    response.error = 'Error recovering password';
+    return res.status(500).send(response);
+  }
 
-//   if (result === null) {
-//     response.error = 'Error getting users';
-//     return res.status(500).send(response);
-//   }
+  if (result === 'User not found') {
+    response.error = result;
+    return res.status(404).send(response);
+  }
 
-//   result.forEach((jewel) => {
-//     // HATOES
-//     const links = getLinks({
-//       host: req.headers.host,
-//       route: 'users',
-//       id: jewel.id_jewel,
-//     });
-//     jewel.links = links;
-//   });
+  response.data = true;
+  res.status(200).send(response);
+}
 
-//   response.data = result;
-//   return res.status(200).send(response);
-// }
+async function updateUser(req, res) {
+  const response = {
+    message: 'Update user',
+    data: null,
+    error: null,
+  };
 
-// async function getJewel(req, res) {
-//   const response = {
-//     data: null,
-//     error: null,
-//   };
+  const { userId } = req.params;
 
-//   const { id } = req.params;
+  //valida existencia de parametros
+  const { nombre, apellido, rut, correo, contrasena } = req.body;
+  if (!nombre || !apellido || !rut || !correo || !contrasena) {
+    response.error = 'Missing required parameters';
+    return res.status(400).send(response);
+  }
 
-//   const result = await usersModel.get(id);
+  const result = await usersModel.update(userId, req.body);
 
-//   if (result === false) {
-//     response.error = 'Error getting jewel';
-//     return res.staus(500).send(response);
-//   }
+  if (result === null) {
+    response.error = 'Error updating user';
+    return res.status(500).send(response);
+  }
 
-//   // HATOES
-//   const links = getLinks({
-//     host: req.headers.host,
-//     route: 'users',
-//     id: result.id_jewel,
-//   });
-//   result.links = links;
+  if (result === 'Email already exists') {
+    response.error = result;
+    return res.status(409).send(response);
+  }
 
-//   response.data = result;
-//   return res.status(200).send(response);
-// }
+  if (result === 'User not found') {
+    response.error = result;
+    return res.status(400).send(response);
+  }
 
-// async function updateJewel(req, res) {
-//   const response = {
-//     data: null,
-//     error: null,
-//   };
+  response.data = true;
+  return res.status(200).send(response);
+}
 
-//   const { id } = req.params;
-
-//   const result = await usersModel.update(id, req.body);
-
-//   if (result === null) {
-//     response.error = 'Error updating jewel';
-//     return res.status(500).send(response);
-//   }
-
-//   // HATOES
-//   const links = getLinks({
-//     host: req.headers.host,
-//     route: 'users',
-//     id: result.id_jewel,
-//   });
-//   result.links = links;
-
-//   response.data = result;
-//   return res.status(200).send(response);
-// }
-
-// async function deleteJewel(req, res) {
-//   const response = {
-//     data: null,
-//     error: null,
-//   };
-
-//   const { id } = req.params;
-
-//   const result = await usersModel.delete(id);
-
-//   if (result === null) {
-//     response.error = 'Error deleting jewel';
-//     return res.status(500).send(response);
-//   }
-
-//   if (result.affectedRows === 0) {
-//     response.error = 'Id not found';
-//     return res.status(400).send(response);
-//   }
-
-//   response.data = result;
-//   return res.status(200).send(response);
-// }
-
-export {
-  register,
-  login,
-  // recoverPassword, updateUser
-};
+export { registerUser, login, recoverPassword, updateUser };

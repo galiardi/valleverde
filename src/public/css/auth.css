@@ -1,0 +1,42 @@
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: azure;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+#login-form > input p h3 {
+  margin: 0.5rem;
+  padding: 0.25rem;
+}
+
+#login-form > button {
+  margin-bottom: 0.5rem;
+}
+
+#signup-form {
+  align-items: start;
+}
+
+#signup-form > h3,
+input {
+  margin-bottom: 1rem;
+  padding: 0.25rem;
+}
+
+input {
+  border-radius: 0.25rem;
+}
+
+input {
+  background-color: azure;
+  border: 1px solid rgba(200, 200, 200, 0.5);
+}
+
+@media (min-with: 576px) {
+  form {
+    padding: 2rem;
+  }
+}

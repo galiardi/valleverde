@@ -33,7 +33,7 @@ CREATE TABLE eventos(
   id_evento INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(45) NOT NULL,
   descripcion VARCHAR(100) NOT NULL,
-  fecha_hora DATE,
+  fecha_hora DATETIME,
   ubicacion VARCHAR(50)
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE imagenes(
   id_imagen INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   url_imagen VARCHAR(256),
   fecha_subida TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  descripcion VARCHAR(100) NOT NULL,
+  descripcion VARCHAR(100),
   id_evento INT UNSIGNED NOT NULL,
   FOREIGN KEY (id_evento) REFERENCES eventos(id_evento)
 );
@@ -55,5 +55,8 @@ CREATE TABLE registro_evento(
   FOREIGN KEY (id_evento) REFERENCES eventos(id_evento),
   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
+-- Para evitar que un usuario se registre 2 veces en el mismo evento
+ALTER TABLE registro_evento ADD CONSTRAINT evento_usuario UNIQUE(id_evento, id_usuario);
 
 INSERT INTO roles (nombre) VALUES ('administrador'), ('usuario');
+

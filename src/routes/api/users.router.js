@@ -1,16 +1,18 @@
 import { Router } from 'express';
 import {
-  register,
+  registerUser,
   login,
-  // recoverPassword,
-  // updateUser,
+  recoverPassword,
+  updateUser,
 } from '../../controllers/users.controller.js';
+import { validateToken } from '../../middlewares/validateToken.js';
+import { validateOwnership } from '../../middlewares/validateOwnership.js';
 
 const router = Router();
 
-router.post('/register', register);
+router.post('/register', registerUser);
 router.post('/login', login);
-// router.post('/recover-password', recoverPassword);
-// router.put('/:userId', updateUser);
+router.post('/recover-password', recoverPassword);
+router.put('/:userId', validateToken, validateOwnership, updateUser);
 
 export default router;
