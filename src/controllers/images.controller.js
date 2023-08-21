@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { imagesModel } from '../models/imagesModel.js';
-import { eventsModel } from '../models/events.model.js';
+import { Image } from '../models/image.model.js';
+import { Event } from '../models/event.model.js';
 import { get__dirname } from '../functions/get__.js';
 
 const __dirname = get__dirname(import.meta.url);
@@ -14,9 +14,9 @@ async function createImage(req, res) {
   };
 
   const file = req.files?.file;
-  const { id_evento, descripcion } = req.body;
+  const { id_event, description } = req.body;
 
-  if (!id_evento || !file) {
+  if (!id_event || !file) {
     // descripcion opcional
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
@@ -28,20 +28,20 @@ async function createImage(req, res) {
   }
 
   // valida la existencia del evento
-  const event = await eventsModel.getById(id_evento);
+  const event = await Event.getEventById(id_event);
   if (!event) {
     response.error = 'Event does not exist';
     return res.status(400).send(response);
   }
 
-  // valida existencia de un directorio con el nombre correspondiente al id proporcionado(id_evento), si no existe lo crea
+  // valida existencia de un directorio con el nombre correspondiente al id_event proporcionado, si no existe lo crea
   const folder = path.join(
     __dirname,
     '..',
     'public',
     'images',
     'events',
-    id_evento
+    id_event
   );
   try {
     await fs.access(folder);
@@ -58,21 +58,18 @@ async function createImage(req, res) {
     return res.status(500).send(response);
   }
 
-  const url_imagen = `http://${req.headers.host}/images/events/${id_evento}/${file.name}`;
+  const image_url = `http://${req.headers.host}/images/events/${id_event}/${file.name}`;
 
   // asigna las imagenes al evento
-  const result = await imagesModel.create({
-    url_imagen,
-    descripcion,
-    id_evento,
-  });
+  const image = new Image({ image_url, description, id_event });
+  const result = await image.create();
 
   if (result === null) {
     response.error = 'Error saving image';
     return res.status(500).send(response);
   }
 
-  response.data = url_imagen;
+  response.data = { image_url };
   res.status(201).send(response);
 }
 
@@ -86,13 +83,13 @@ async function getImagesByEventId(req, res) {
   const { eventId } = req.params;
 
   // valida la existencia del evento (opcional)
-  const event = await eventsModel.getById(eventId);
+  const event = await Event.getEventById(eventId);
   if (!event) {
     response.error = 'Event not found';
     return res.status(404).send(response);
   }
 
-  const result = await imagesModel.getImagesByEventId(eventId);
+  const result = await Image.getImagesByEventId(eventId);
   if (!result) {
     response.error = 'Error getting images';
     return res.status(500).send(response);

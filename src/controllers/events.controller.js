@@ -1,6 +1,6 @@
-import { eventsModel } from '../models/events.model.js';
-import { usersModel } from '../models/users.model.js';
-import { registro_eventoModel } from '../models/registro_evento.model.js';
+import { Event } from '../models/event.model.js';
+import { User } from '../models/user.model.js';
+import { RecordEvent } from '../models/recordEvent.model.js';
 import { sendEmail } from '../functions/sendEmail.js';
 
 async function registerUserOnEvent(req, res) {
@@ -11,19 +11,20 @@ async function registerUserOnEvent(req, res) {
   };
 
   // valida la existencia de los parametros requeridos
-  const { id_evento, id_usuario, arboles_cantidad } = req.body;
-  if (!id_evento || !id_usuario || !arboles_cantidad) {
+  const { id_event, id_user, trees } = req.body;
+  if (!id_event || !id_user || !trees) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
 
   // valida que el usuario que se esta registrando corresponda con el usuario del token
-  if (id_usuario != res.locals.id_usuario) {
-    response.error = 'Not ownership';
+  if (id_user != res.locals.id_user) {
+    response.error = 'Invalid ownership';
     return res.status(403).send(response);
   }
 
-  const result = await registro_eventoModel.create(req.body);
+  const recordEvent = new RecordEvent(req.body);
+  const result = await recordEvent.create();
 
   if (result === null) {
     response.error = 'Error registering user on event';
@@ -45,15 +46,15 @@ async function registerUserOnEvent(req, res) {
   res.status(201).send(response);
 
   try {
-    const user = await usersModel.getUserById(id_usuario);
-    const event = await eventsModel.getById(id_evento);
+    const user = await User.getUserById(id_user);
+    const event = await Event.getEventById(id_event);
 
     if (!user || !event) return;
 
     sendEmail({
-      email: user.correo,
+      email: user.email,
       subject: 'Confirmacion de registro',
-      message: `Usted se ha registrado en el evento ${event.nombre}.`,
+      message: `Usted se ha registrado en el evento ${event.name}.`,
     });
   } catch (error) {
     console.log(error);
@@ -68,13 +69,14 @@ async function createEvent(req, res) {
   };
 
   // valida la existencia de los parametros requeridos
-  const { nombre, descripcion, fechaHora, ubicacion } = req.body;
-  if (!nombre || !descripcion || !fechaHora || !ubicacion) {
+  const { name, description, date_time, location } = req.body;
+  if (!name || !description || !date_time || !location) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
 
-  const result = await eventsModel.create(req.body);
+  const event = new Event(req.body);
+  const result = await event.create();
 
   if (result === null) {
     response.error = 'Error creating event';
@@ -92,7 +94,7 @@ async function getAllEvents(req, res) {
     error: null,
   };
 
-  const result = await eventsModel.getAll();
+  const result = await Event.getAll();
 
   if (result === null) {
     response.error = 'Error getting events';
@@ -112,7 +114,7 @@ async function getEventByYear(req, res) {
 
   const { year } = req.params;
 
-  const result = await eventsModel.getByYear(year);
+  const result = await Event.getEventByYear(year);
 
   if (result === null) {
     response.error = 'Error getting event';

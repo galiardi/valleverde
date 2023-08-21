@@ -1,4 +1,4 @@
-## Consultas a la base de datos
+## Consultas a la base de datos con mysql2
 
 Como se comenta en https://github.com/sidorares/node-mysql2/issues/745,
 
@@ -14,7 +14,8 @@ await conn.execute(query);
 conn.release();
 ```
 
-Por lo tanto, utilizaremos la primera alternativa caundo sea posible con el objetivo de simplificar el código.
+Por lo tanto, utilizaremos la primera alternativa cuando sea posible con el objetivo de simplificar el código.
+<br></br>
 
 ---
 

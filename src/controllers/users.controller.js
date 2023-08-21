@@ -1,4 +1,4 @@
-import { usersModel } from '../models/users.model.js';
+import { User } from '../models/user.model.js';
 
 async function registerUser(req, res) {
   const response = {
@@ -7,14 +7,15 @@ async function registerUser(req, res) {
     error: null,
   };
 
-  // id_rol (ver usersModel)
-  const { nombre, apellido, rut, correo, contrasena } = req.body;
-  if (!nombre || !apellido || !rut || !correo || !contrasena) {
+  // id_rol (ver user.model.js)
+  const { name, lastname, rut, email, password } = req.body;
+  if (!name || !lastname || !rut || !email || !password) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
 
-  const result = await usersModel.create(req.body);
+  const user = new User(req.body);
+  const result = await user.create();
 
   if (result === null) {
     response.error = 'Error registering user';
@@ -46,13 +47,13 @@ async function login(req, res) {
     error: null,
   };
 
-  const { correo, contrasena } = req.body;
-  if (!correo || !contrasena) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
 
-  const result = await usersModel.login(req.body);
+  const result = await User.login(req.body);
 
   if (result === null) {
     response.error = 'Error logging in user';
@@ -85,13 +86,13 @@ async function recoverPassword(req, res) {
     error: null,
   };
 
-  const { correo } = req.body;
-  if (!correo) {
+  const { email } = req.body;
+  if (!email) {
     response.error = 'Missing required parameter';
     return res.status(400).send(response);
   }
 
-  const result = await usersModel.recoverPassword(correo);
+  const result = await User.recoverPassword(email);
 
   if (result === null) {
     response.error = 'Error recovering password';
@@ -117,13 +118,14 @@ async function updateUser(req, res) {
   const { userId } = req.params;
 
   //valida existencia de parametros
-  const { nombre, apellido, rut, correo, contrasena } = req.body;
-  if (!nombre || !apellido || !rut || !correo || !contrasena) {
+  const { name, lastname, rut, email, password } = req.body;
+  if (!name || !lastname || !rut || !email || !password) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
 
-  const result = await usersModel.update(userId, req.body);
+  const user = new User({ userId, ...req.body });
+  const result = await User.update();
 
   if (result === null) {
     response.error = 'Error updating user';

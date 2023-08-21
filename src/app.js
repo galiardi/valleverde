@@ -8,15 +8,17 @@ import pagesRouter from './routes/pages/index.js';
 
 const app = express();
 
+// setup de handlebars
 app.set('view engine', 'hbs');
 app.set('views', 'src/views');
 
+// middlewares
 app.use(morgan('dev'));
 app.use(cors());
 // guardaremos el jwt en las cookies para saber si el usuario esta logeado antes de renderizar las vistas
 app.use(cookieParser());
 app.use(express.json());
-// usaremos urlencoded para leer el id enviado en el body junto al archivo de la imagen
+// usaremos urlencoded para leer la informacion enviada en el body junto al archivo de la imagen
 app.use(express.urlencoded({ extended: false }));
 app.use(
   fileupload()
@@ -28,7 +30,9 @@ app.use(
   // }
 );
 app.use(express.static('src/public'));
+
+// rutas
 app.use('/api', apiRouter);
-app.use('/', pagesRouter); // las rutas que renderizaran las vistas
+app.use('/', pagesRouter); // rutas para renderizar las vistas
 
 export default app;

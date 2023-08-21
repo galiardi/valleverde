@@ -1,5 +1,5 @@
-import { donationsModel } from '../models/donations.model.js';
-import { usersModel } from '../models/users.model.js';
+import { Donation } from '../models/donation.model.js';
+import { User } from '../models/user.model.js';
 import { sendEmail } from '../functions/sendEmail.js';
 
 async function createDonation(req, res) {
@@ -9,22 +9,22 @@ async function createDonation(req, res) {
     error: null,
   };
 
-  const { id_usuario, monto } = req.body; // fecha_donacion DEFAULT CURRENT_TIMESTAMP
+  const { id_user, quantity } = req.body;
 
-  if (!id_usuario || !monto) {
+  if (!id_user || !quantity) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }
 
-  const result = await donationsModel.create(req.body);
+  const donation = new Donation(req.body);
+  const result = await donation.create();
 
-  // por confirmar
   if (result === null) {
     response.error = 'Error creating donation';
     return res.status(500).send(response);
   }
 
-  // En caso que se proporcione un id_usuario invalido (ver donations.model.js)
+  // si se proporciona un id_user que no existe
   if (result === 'User not found') {
     response.error = result;
     return res.status(404).send(response);
@@ -35,14 +35,14 @@ async function createDonation(req, res) {
   res.status(201).send(response);
 
   try {
-    const user = await usersModel.getUserById(id_usuario);
+    const user = await User.getUserById(id_user);
 
     if (!user) return;
 
     sendEmail({
-      email: user.correo,
+      email: user.email,
       subject: 'Confirmacion de donacion',
-      message: `Usted ha donado ${monto} pesos. Numero de registro: ${result.insertId}.`,
+      message: `Usted ha donado ${quantity} pesos. Numero de registro: ${result.insertId}.`,
     });
   } catch (error) {
     console.log(error);
@@ -58,7 +58,7 @@ async function getDonationsByUserId(req, res) {
 
   const { userId } = req.params;
 
-  const result = await donationsModel.getDonationsByUserId(userId);
+  const result = await Donation.getDonationsByUserId(userId);
 
   if (result === null) {
     response.error = 'Error getting donations';
