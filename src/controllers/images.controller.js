@@ -16,8 +16,7 @@ async function createImage(req, res) {
   const file = req.files?.file;
   const { id_event, description } = req.body;
 
-  if (!id_event || !file) {
-    // descripcion opcional
+  if (!id_event || !description || !file) {
     response.error = 'Missing required parameters';
     return res.status(400).send(response);
   }

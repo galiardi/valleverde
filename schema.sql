@@ -41,7 +41,7 @@ CREATE TABLE images(
   id_image INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   image_url VARCHAR(256),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  description VARCHAR(100),
+  description VARCHAR(100) NOT NULL,
   id_event INT UNSIGNED NOT NULL,
   FOREIGN KEY (id_event) REFERENCES events(id_event)
 );
@@ -58,5 +58,8 @@ CREATE TABLE record_event(
 -- Para evitar que un usuario se registre 2 veces en el mismo evento
 ALTER TABLE record_event ADD CONSTRAINT event_user UNIQUE(id_event, id_user);
 
+-- crea los roles
 INSERT INTO rols (name) VALUES ('admin'), ('user');
+
+
 

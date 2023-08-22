@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileupload from 'express-fileupload';
 import apiRouter from './routes/api/index.js';
+import authRouter from './routes/auth/index.js';
 import pagesRouter from './routes/pages/index.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(express.static('src/public'));
 
 // rutas
 app.use('/api', apiRouter);
-app.use('/', pagesRouter); // rutas para renderizar las vistas
+app.use('/auth', authRouter); // rutas para renderizar signup, login y para hacer logout
+app.use('/', pagesRouter); // rutas para renderizar las paginas
 
 export default app;

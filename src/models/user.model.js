@@ -94,11 +94,12 @@ class User {
 
       // Creamos un password provisorio para enviar al cliente
       const tempPassword = String(getRandomNumN(6)); // numero aleatorio de 6 cifras (string)
-      console.log(tempPassword);
+
+      const hashed_password = await bcrypt.hash(tempPassword, 10);
 
       const [result] = await promisePool.execute(
         'UPDATE users SET password = ? WHERE email = ?',
-        [tempPassword, email]
+        [hashed_password, email]
       );
 
       if (result.affectedRows !== 1) return null;
@@ -118,6 +119,7 @@ class User {
 
   async update() {
     try {
+      const hashed_password = await bcrypt.hash(this.password, 10);
       // actauliza el usuario
       const [result] = await promisePool.execute(
         `
@@ -129,7 +131,7 @@ class User {
           this.lastname,
           this.rut,
           this.email,
-          this.password,
+          hashed_password,
           this.id_rol,
           this.id_user,
         ]
@@ -137,7 +139,10 @@ class User {
 
       if (result.affectedRows === 0) return 'User not found';
 
-      return true;
+      // al actualizar el usuario, es necesario actualizar el token, ya que este posee los datos del usuario
+      delete this.hashed_password;
+      const token = jwt.sign({ ...this }, TOKEN_KEY, { expiresIn: '1d' });
+      return token;
     } catch (error) {
       console.log(error);
       // si el usuario quiere actualizar su email a un email que ya esta registrado (email UNIQUE)

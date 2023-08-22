@@ -1,22 +1,22 @@
 const signupForm = document.getElementById('signup-form');
-const nombreInput = document.getElementById('nombre');
-const apellidoInput = document.getElementById('apellido');
-const rutInput = document.getElementById('rut');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
+const name = document.getElementById('name');
+const lastname = document.getElementById('lastname');
+const rut = document.getElementById('rut');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
 
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
-    const response = await fetch('/api/users/signup', {
+    const response = await fetch('/api/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nombre: nombreInput.value.trim(),
-        apellido: apellidoInput.value.trim(),
-        rut: rutInput.value.trim(),
-        correo: emailInput.value.trim(),
-        contrasena: passwordInput.value.trim(),
+        name: name.value.trim(),
+        lastname: lastname.value.trim(),
+        rut: rut.value.trim(),
+        email: email.value.trim(),
+        password: password.value.trim(),
       }),
     });
     const { data, error } = await response.json();

@@ -6,8 +6,8 @@ function validateOwnership(req, res, next) {
   const reqUserId = splitedUrl.slice(-1);
 
   // compara el userId de la ruta con el id_usuario de la informacion obtenida del token, guardada en res.locals
-  if (reqUserId != res.locals.user.id_usuario) {
-    return res.status(403).send({ error: 'Not ownership' });
+  if (reqUserId != res.locals.user.id_user) {
+    return res.status(403).send({ error: 'Invalid ownership' });
   }
   next();
 }

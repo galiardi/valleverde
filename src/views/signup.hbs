@@ -1,25 +1,31 @@
-<header>
-  <h1>Valle verde</h1>
-  <h1>Reforesta</h1>
-</header>
+<div class='container-column-row'>
+  <header>
+    <h1>Valle verde</h1>
+    <h1>Reforesta</h1>
+  </header>
 
-<form id='signup-form'>
-  <h3>Registrate</h3>
-  <label for='nombre'>Nombre</label>
-  <input id='nombre' type='text' placeholder='Ingresa tu nombre' />
+  <form id='signup-form' class='labeled-form'>
+    <h3>Registrate</h3>
+    <label for='name'>Nombre</label>
+    <input id='name' type='text' placeholder='Ingresa tu nombre' />
 
-  <label for='apellido'>Apellido</label>
-  <input id='apellido' type='text' placeholder='Ingresa tu apellido' />
+    <label for='lastname'>Apellido</label>
+    <input id='lastname' type='text' placeholder='Ingresa tu apellido' />
 
-  <label for='rut'>Rut</label>
-  <input id='rut' type='text' placeholder='Ingresa tu rut' />
+    <label for='rut'>Rut</label>
+    <input id='rut' type='text' placeholder='Ingresa tu rut' />
 
-  <label for='email'>Email</label>
-  <input id='email' type='text' placeholder='Ingresa tu email' />
+    <label for='email'>Email</label>
+    <input id='email' type='text' placeholder='Ingresa tu email' />
 
-  <label for='password'>Password</label>
-  <input id='password' placeholder='Ingresa tu constrasena' />
+    <label for='password'>Password</label>
+    <input id='password' placeholder='Ingresa tu constrasena' />
 
-  <p>Ya tienes una cuenta? <a href='/login'>Inicia sesion aqui</a></p>
-</form>
-<script defer src='js/signup.js'></script>
+    <div class='button-div'>
+      <button class='btn btn-success' type='submit'>Registrarse</button>
+    </div>
+
+    <p>Ya tienes una cuenta? <a href='/auth/login'>Inicia sesion aqui</a></p>
+  </form>
+</div>
+<script defer src='/js/signup.js'></script>

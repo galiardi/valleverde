@@ -16,14 +16,21 @@ form {
   margin-bottom: 0.5rem;
 }
 
-#signup-form {
+.labeled-form {
   align-items: start;
 }
 
-#signup-form > h3,
+.labeled-form > h3,
 input {
   margin-bottom: 1rem;
   padding: 0.25rem;
+}
+
+.button-div {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 input {

@@ -8,6 +8,7 @@ class Image {
   }
 
   async create() {
+    console.log(this);
     try {
       const [result] = await promisePool.execute(
         'INSERT INTO images (image_url, description, id_event) values (?, ?, ?)',

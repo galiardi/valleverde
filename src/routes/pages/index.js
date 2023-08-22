@@ -1,32 +1,22 @@
 import { Router } from 'express';
 import { ifTokenSetUser } from '../../middlewares/ifTokenSetUser.js';
+import { verifyUserToken } from '../../middlewares/verifyUserToken.js';
 
 const router = Router();
 
 // home // si usuario esta logeado modificamos el renderizado de la pagina (mainLayout.hbs)
 router.get('/', ifTokenSetUser, (req, res) => {
-  res.render('home', { layout: 'layouts/mainLayout' });
+  res.render('home', { title: 'Inicio', layout: 'layouts/mainLayout' });
 });
 
-// login
-router.get('/login', ifTokenSetUser, (req, res) => {
-  if (req.locals?.user) {
-    return res.redirect('/');
-  }
-  res.render('login', { layout: 'layouts/authLayout' });
+// profile // si el token no es valido no permite entrar
+router.get('/profile', verifyUserToken, (req, res) => {
+  res.render('profile', { title: 'Mi perfil', layout: 'layouts/mainLayout' });
 });
 
-// signup
-router.get('/signup', ifTokenSetUser, (req, res) => {
-  if (req.locals?.user) {
-    return res.redirect('/');
-  }
-  res.render('signup', { layout: 'layouts/authLayout' });
-});
-
-// logout
-router.get('/logout', (req, res) => {
-  return res.clearCookie('access_token').redirect('/');
+// gallery
+router.get('/gallery', (req, res) => {
+  res.render('gallery', { title: 'Galeria', layout: 'layouts/mainLayout' });
 });
 
 export default router;

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { TOKEN_KEY } from '../config.js';
 
-// Este middleware la usamos antes de entrar a una pagina
+// Este middleware lo usamos antes de entrar al home, u otra pagina que modifique su renderizado si hay un usuario logeado
 // Si hay un token valido en las cookies, guarda el payload en res.locals.user, si no, sigue adelante
 
 function ifTokenSetUser(req, res, next) {

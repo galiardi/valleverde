@@ -1,0 +1,32 @@
+<div class='container-column-row'>
+  <header>
+    <h1>Mi perfil</h1>
+  </header>
+
+  <form id='update-form' class='labeled-form'>
+
+    <h3>Edita tu perfil</h3>
+    <label for='name'>Nombre</label>
+    <input id='name' type='text' value='{{user.name}}' />
+
+    <label for='lastname'>Apellido</label>
+    <input id='lastname' type='text' value='{{user.lastname}}' />
+
+    <label for='rut'>Rut</label>
+    <input id='rut' type='text' value='{{user.rut}}' />
+
+    <label for='email'>Email</label>
+    <input id='email' type='text' value='{{user.email}}' />
+
+    <label for='password'>Password</label>
+    <input id='password' />
+
+    <div class='button-div'>
+      <button class='btn btn-success' type='submit'>Editar perfil</button>
+    </div>
+
+  </form>
+</div>
+{{! id_user se necesita en update.js, en la ruta para actualizar el usuario }}
+<script defer>const id_user = {{user.id_user}}</script>
+<script defer src='/js/update.js'></script>

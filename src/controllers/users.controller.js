@@ -124,8 +124,8 @@ async function updateUser(req, res) {
     return res.status(400).send(response);
   }
 
-  const user = new User({ userId, ...req.body });
-  const result = await User.update();
+  const user = new User({ id_user: userId, ...req.body });
+  const result = await user.update();
 
   if (result === null) {
     response.error = 'Error updating user';
@@ -141,9 +141,15 @@ async function updateUser(req, res) {
     response.error = result;
     return res.status(400).send(response);
   }
-
-  response.data = true;
-  return res.status(200).send(response);
+  const token = result;
+  response.data = { token };
+  return res
+    .cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    .status(200)
+    .send(response);
 }
 
 export { registerUser, login, recoverPassword, updateUser };
